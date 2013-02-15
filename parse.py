@@ -6,10 +6,11 @@ class Command(object):
         self._content = content
 
     def __str__(self):
-        return '<Command: {0} Content: "{1}">'.format(
+        return '<Command: "{0}"{1}>'.format(
                 self.getName(),
-                ''.join([str(i) for i in self._content]) if self._content else
-                None
+                ' Content: "' + ''.join([str(i) for i in self._content]) + '"'
+                    if self._content
+                    else ''
             )
 
     def getName(self):
