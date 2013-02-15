@@ -46,32 +46,29 @@ class Parser(object):
     def normal_text(self, inScope=False):
         end = False
         tokens = []
-        while not end:
-            if self.has_more_chars():
-                if not self.current_is(*self.commandChars):
-                    tokens += [self.get_current()]
-                    self.next_current()
+        while self.has_more_chars():
+            if not self.current_is(*self.commandChars):
+                tokens += [self.get_current()]
+                self.next_current()
 
-                elif self.current_is('\\'):
-                    self.next_current()
-                    tokens += [self.command()]
-                elif inScope and self.current_is('}'):
-                    self.next_current()
-                    return tokens
-                else:
-                    raise IOError(
-                        'I\'m not sure what to do with the character "%s"' %
-                        self.get_current()
-                    )
+            elif self.current_is('\\'):
+                self.next_current()
+                tokens += [self.command()]
+            elif inScope and self.current_is('}'):
+                self.next_current()
+                return tokens
             else:
-                end = True
+                raise IOError(
+                    'I\'m not sure what to do with the character "%s"' %
+                    self.get_current()
+                )
         return tokens
 
     def command(self):
         end = False
         name = ''
         commandContent = None
-        while not end:
+        while True:
             if not self.current_is(' ', *self.commandChars):
                 thisChar = self.get_current()
                 self.next_current()
