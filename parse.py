@@ -45,7 +45,6 @@ class Parser(object):
         return self._file.read(1)
 
     def normal_text(self, inScope=False):
-        end = False
         tokens = []
         while self.has_more_chars():
             if not self.current_is(*self.commandChars):
@@ -66,7 +65,6 @@ class Parser(object):
         return tokens
 
     def command(self):
-        end = False
         name = ''
         commandContent = None
         while True:
