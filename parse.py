@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 
 class Command(object):
-    def __init__(self, name):
+    def __init__(self, name, content=None):
         self._name = name
+        self._content = content
 
     def __str__(self):
-        return '<Command: ' + self.getName() + '>'
+        return '<Command: {0} Content: "{1}">'.format(
+                self.getName(),
+                ''.join([str(i) for i in self._content]) if self._content else
+                None
+            )
 
     def getName(self):
         return self._name
@@ -29,6 +34,7 @@ class Parser(object):
         return self._tex[self._i]
 
     def next_current(self):
+        print self._i, self.get_current()
         self._i += 1
 
     def has_more_chars(self):
@@ -37,33 +43,45 @@ class Parser(object):
     def _read_next(self):
         return self._file.read(1)
 
-    def normal_text(self):
+    def normal_text(self, inScope=False):
         end = False
+        tokens = []
         while not end:
             if self.has_more_chars():
                 if not self.current_is(*self.commandChars):
-                    self.tokens += [self.get_current()]
+                    tokens += [self.get_current()]
                     self.next_current()
 
                 elif self.current_is('\\'):
                     self.next_current()
-                    self.command()
+                    tokens += [self.command()]
+                elif inScope and self.current_is('}'):
+                    self.next_current()
+                    return tokens
+                else:
+                    raise IOError(
+                        'I\'m not sure what to do with the character "%s"' %
+                        self.get_current()
+                    )
             else:
                 end = True
+        return tokens
 
     def command(self):
         end = False
         name = ''
+        commandContent = None
         while not end:
             if not self.current_is(' ', *self.commandChars):
                 thisChar = self.get_current()
                 self.next_current()
                 name += thisChar
+            elif self.current_is('{'):
+                self.next_current()
+                commandContent = self.normal_text(inScope=True)
             else:
-                self.tokens += [Command(name)]
-                end = True
+                return Command(name, content=commandContent)
 
 if __name__ == '__main__':
     p = Parser('exampleInput/simple.tex')
-    p.normal_text()
-    print ''.join([str(i) for i in p.tokens])
+    print ''.join([str(i) for i in p.normal_text()])
