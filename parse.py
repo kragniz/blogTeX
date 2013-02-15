@@ -38,24 +38,30 @@ class Parser(object):
         return self._file.read(1)
 
     def normal_text(self):
-        if self.has_more_chars():
-            if not self.current_is(*self.commandChars):
-                self.tokens += [self.get_current()]
-                self.next_current()
-                self.normal_text()
+        end = False
+        while not end:
+            if self.has_more_chars():
+                if not self.current_is(*self.commandChars):
+                    self.tokens += [self.get_current()]
+                    self.next_current()
 
-            elif self.current_is('\\'):
-                self.next_current()
-                self.command()
-                self.normal_text()
+                elif self.current_is('\\'):
+                    self.next_current()
+                    self.command()
+            else:
+                end = True
 
-    def command(self, name=''):
-        if not self.current_is(' ', *self.commandChars):
-            thisChar = self.get_current()
-            self.next_current()
-            self.command(name + thisChar)
-        else:
-            self.tokens += [Command(name)]
+    def command(self):
+        end = False
+        name = ''
+        while not end:
+            if not self.current_is(' ', *self.commandChars):
+                thisChar = self.get_current()
+                self.next_current()
+                name += thisChar
+            else:
+                self.tokens += [Command(name)]
+                end = True
 
 if __name__ == '__main__':
     p = Parser('exampleInput/simple.tex')
