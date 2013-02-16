@@ -117,5 +117,5 @@ class Lexer(object):
 
 
 if __name__ == '__main__':
-    l = Parser('exampleInput/simple.tex')
+    l = Lexer('exampleInput/simple.tex')
     print ''.join([str(i) for i in p.normal_text()])
