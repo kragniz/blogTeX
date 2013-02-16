@@ -77,7 +77,6 @@ class Lexer(object):
             elif self.__char_is('['):
                 self.__next()
                 commandArguments = self.command_arguments()
-                print commandArguments
             else:
                 break
         return Command(name,
@@ -107,8 +106,7 @@ class Lexer(object):
                 args[argName] = argValue
                 self.__next()
 
-            elif _(' '):
-                print 'hoi'
+            elif _(' '): #FIXME this doesn't work for some reason
                 self.__next()
 
             else:
