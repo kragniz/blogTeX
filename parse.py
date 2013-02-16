@@ -18,7 +18,7 @@ class Command(object):
     def getName(self):
         return self._name
 
-class Parser(object):
+class Lexer(object):
     def __init__(self, filename):
         self.commandChars = [c for c in '\\{}#$%^&[]']
         self._tex = open(filename).read()
@@ -27,8 +27,8 @@ class Parser(object):
 
         self.tokens = []
         
-    def current_is(self, *args):
-        if self._i < self._fileLength:
+    def __char_is(self, *args):
+        if self.has_more_chars():
             return self.get_current() in args
         else:
             return False
@@ -36,28 +36,25 @@ class Parser(object):
     def get_current(self):
         return self._tex[self._i]
 
-    def next_char(self):
-        print self._i, self.get_current()
+    def __next(self):
+        print '%s "%s"' % (self._i, self.get_current())
         self._i += 1
 
     def has_more_chars(self):
         return self._i < self._fileLength
 
-    def _read_next(self):
-        return self._file.read(1)
-
     def normal_text(self, inScope=False):
         tokens = []
         while self.has_more_chars():
-            if not self.current_is(*self.commandChars):
+            if not self.__char_is(*self.commandChars):
                 tokens += [self.get_current()]
-                self.next_char()
+                self.__next()
 
-            elif self.current_is('\\'):
-                self.next_char()
+            elif self.__char_is('\\'):
+                self.__next()
                 tokens += [self.command()]
-            elif inScope and self.current_is('}'):
-                self.next_char()
+            elif inScope and self.__char_is('}'):
+                self.__next()
                 return tokens
             else:
                 raise IOError(
@@ -71,54 +68,56 @@ class Parser(object):
         commandContent = None
         commandArguments = None
         while self.has_more_chars():
-            if not self.current_is(' ', *self.commandChars):
+            if not self.__char_is(' ', *self.commandChars):
                 name += self.get_current()
-                self.next_char()
-            elif self.current_is('{'):
-                self.next_char()
+                self.__next()
+            elif self.__char_is('{'):
+                self.__next()
                 commandContent = self.normal_text(inScope=True)
-            elif self.current_is('['):
-                self.next_char()
+            elif self.__char_is('['):
+                self.__next()
                 commandArguments = self.command_arguments()
                 print commandArguments
             else:
                 break
-        return Command(name, content=commandContent,
-                                args=commandArguments)
-
-
+        return Command(name,
+                       content=commandContent,
+                       args=commandArguments)
 
     def command_arguments(self):
         args = {}
         nextArg = True
-        def add():
-            nextArg = True
-            args[argName] = argValue
-            #self.next_char()
-
-        while True:
+        _ = self.__char_is
+        while self.has_more_chars():
             if nextArg:
                 argValue = ''
                 argName = None
                 nextArg = False
 
-            if not self.current_is('=', ',', *self.commandChars):
+            if not _('=', ',', *self.commandChars):
                 argValue += self.get_current()
-                self.next_char()
-            elif self.current_is('='):
+                self.__next()
+            elif _('='):
                 argName = argValue
                 argValue = ''
-                self.next_char()
-            elif self.current_is(','):
-                add()
-            elif self.current_is(' '):
-                self.next_char()
+                self.__next()
+
+            elif _(','):
+                nextArg = True
+                args[argName] = argValue
+                self.__next()
+
+            elif _(' '):
+                print 'hoi'
+                self.__next()
+
             else:
-                add()
-                self.next_char()
+                nextArg = True
+                args[argName] = argValue
+                self.__next()
                 return args
 
 
 if __name__ == '__main__':
-    p = Parser('exampleInput/simple.tex')
+    l = Parser('exampleInput/simple.tex')
     print ''.join([str(i) for i in p.normal_text()])
