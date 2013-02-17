@@ -96,6 +96,7 @@ class Lexer(object):
             if not _('=', ',', *self.commandChars):
                 argValue += self.get_current()
                 self.__next()
+
             elif _('='):
                 argName = argValue
                 argValue = ''
@@ -106,16 +107,13 @@ class Lexer(object):
                 args[argName] = argValue
                 self.__next()
 
-            elif _(' '): #FIXME this doesn't work for some reason
-                self.__next()
-
             else:
                 nextArg = True
-                args[argName] = argValue
+                args[argName.strip()] = argValue.strip()
                 self.__next()
                 return args
 
 
 if __name__ == '__main__':
     l = Lexer('exampleInput/simple.tex')
-    print ''.join([str(i) for i in p.normal_text()])
+    print ''.join([str(i) for i in l.normal_text()])
