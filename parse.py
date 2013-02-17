@@ -108,7 +108,6 @@ class Lexer(object):
                 self.__next()
 
             else:
-                nextArg = True
                 args[argName.strip()] = argValue.strip()
                 self.__next()
                 return args
