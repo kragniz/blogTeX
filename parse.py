@@ -34,10 +34,13 @@ class Lexer(object):
             return False
 
     def get_current(self):
-        return self._tex[self._i]
+        def get(): return self._tex[self._i]
+        if get() == '%':
+            while get() != '\n':
+                self.__next()
+        return get()
 
     def __next(self):
-        print '%s "%s"' % (self._i, self.get_current())
         self._i += 1
 
     def has_more_chars(self):
