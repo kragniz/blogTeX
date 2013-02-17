@@ -1,0 +1,8 @@
+BlogTeX will be a static blogging engine which somewhat emulates LaTeX
+
+To do:
+  * Lexer
+  * Parser
+  * HTML generator
+  * CSS stuff
+  * RSS feed
