@@ -50,15 +50,15 @@ class Lexer(object):
 
     def normal_text(self, inScope=False):
         tokens = []
+        _ = self.__char_is
         while self.has_more_chars():
-            if not self.__char_is(' ', *self.commandChars):
+            if not _(*self.commandChars):
                 tokens += [self.get()]
                 self.__next()
-
-            elif self.__char_is('\\'):
+            elif _('\\'):
                 self.__next()
                 tokens += [self.command()]
-            elif inScope and self.__char_is('}'):
+            elif inScope and _('}'):
                 self.__next()
                 return tokens
             else:
@@ -72,14 +72,15 @@ class Lexer(object):
         name = ''
         commandContent = None
         commandArguments = None
+        _ = self.__char_is
         while self.has_more_chars():
-            if not self.__char_is(' ', *self.commandChars):
+            if not _(' ', *self.commandChars):
                 name += self.get()
                 self.__next()
-            elif self.__char_is('{'):
+            elif _('{'):
                 self.__next()
                 commandContent = self.normal_text(inScope=True)
-            elif self.__char_is('['):
+            elif _('['):
                 self.__next()
                 commandArguments = self.command_arguments()
             else:
