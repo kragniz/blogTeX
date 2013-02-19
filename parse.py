@@ -29,16 +29,18 @@ class Lexer(object):
         
     def __char_is(self, *args):
         if self.has_more_chars():
-            return self.get_current() in args
+            return self.get() in args
         else:
             return False
 
-    def get_current(self):
-        def get(): return self._tex[self._i]
-        if get() == '%':
-            while get() != '\n':
+    def get(self, offset=0):
+        '''Return the character at the current location. Use offset to get the
+        next or previous character'''
+        def _get(): return self._tex[self._i + offset]
+        if _get() == '%':
+            while _get() != '\n':
                 self.__next()
-        return get()
+        return _get()
 
     def __next(self):
         self._i += 1
@@ -49,8 +51,8 @@ class Lexer(object):
     def normal_text(self, inScope=False):
         tokens = []
         while self.has_more_chars():
-            if not self.__char_is(*self.commandChars):
-                tokens += [self.get_current()]
+            if not self.__char_is(' ', *self.commandChars):
+                tokens += [self.get()]
                 self.__next()
 
             elif self.__char_is('\\'):
@@ -62,7 +64,7 @@ class Lexer(object):
             else:
                 raise IOError(
                     'I\'m not sure what to do with the character "%s"' %
-                    self.get_current()
+                    self.get()
                 )
         return tokens
 
@@ -72,7 +74,7 @@ class Lexer(object):
         commandArguments = None
         while self.has_more_chars():
             if not self.__char_is(' ', *self.commandChars):
-                name += self.get_current()
+                name += self.get()
                 self.__next()
             elif self.__char_is('{'):
                 self.__next()
@@ -97,7 +99,7 @@ class Lexer(object):
                 nextArg = False
 
             if not _('=', ',', *self.commandChars):
-                argValue += self.get_current()
+                argValue += self.get()
                 self.__next()
 
             elif _('='):
