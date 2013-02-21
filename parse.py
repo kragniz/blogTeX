@@ -15,7 +15,8 @@ class Command(object):
                 self._args
             )
 
-    def getName(self):
+    @property
+    def name(self):
         return self._name
 
 class Lexer(object):
@@ -117,7 +118,6 @@ class Lexer(object):
                 args[argName.strip()] = argValue.strip()
                 self.__next()
                 return args
-
 
 if __name__ == '__main__':
     l = Lexer('exampleInput/simple.tex')
