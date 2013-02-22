@@ -8,7 +8,7 @@ class Command(object):
 
     def __str__(self):
         return '<Command: "{0}" Args: "{2}"{1}>'.format(
-                self.getName(),
+                self.name,
                 ' Content: "' + ''.join([str(i) for i in self._content]) + '"'
                     if self._content
                     else '',
