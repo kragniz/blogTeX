@@ -75,7 +75,7 @@ class Lexer(object):
         commandArguments = None
         _ = self.__char_is
         while self.has_more_chars():
-            if not _(' ', *self.commandChars):
+            if not _(' ', '\n', *self.commandChars):
                 name += self.get()
                 self.__next()
             elif _('{'):
