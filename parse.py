@@ -119,6 +119,22 @@ class Lexer(object):
                 self.__next()
                 return args
 
+class Transform(object):
+    def __init__(self, tokens):
+        self._tokens = tokens
+        self._html = ''
+
+    def paragraph(self):
+        lastChar = ''
+        for t in self._tokens:
+            if type(t) is Command:
+                print t.name
+            else:
+                if not (t == ' ' and lastChar == ' '):
+                    print '"%s"' % t
+                else: pass
+                lastChar = t
+
 if __name__ == '__main__':
-    l = Lexer('exampleInput/simple.tex')
-    print ''.join([str(i) for i in l.normal_text()])
+    t = Transform(Lexer('exampleInput/post.tex').normal_text())
+    t.paragraph()
