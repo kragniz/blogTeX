@@ -60,7 +60,6 @@ class Lexer(object):
                 self.__next()
                 tokens += [self.command()]
             elif inScope and _('}'):
-                self.__next()
                 return tokens
             else:
                 raise IOError(
@@ -81,6 +80,7 @@ class Lexer(object):
             elif _('{'):
                 self.__next()
                 commandContent = self.normal_text(inScope=True)
+                self.__next()
             elif _('['):
                 self.__next()
                 commandArguments = self.command_arguments()
