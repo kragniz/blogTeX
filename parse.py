@@ -132,11 +132,11 @@ class Transform(object):
         self._tokens = tokens
         self._html = ''
 
-    def __run_method(self, methodName):
-        return getattr(self, methodName)(self)
+    def __run_method(self, methodName, *args):
+        return getattr(self, methodName)(self, *args)
 
     def _run_command(self, command):
-        print self.__run_method(command.name)
+        return self.__run_method(command.name, command.content)
 
     def paragraph(self):
         lastChar = ''
