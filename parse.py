@@ -19,6 +19,14 @@ class Command(object):
     def name(self):
         return self._name
 
+    @property
+    def args(self):
+        return self._args
+
+    @property
+    def content(self):
+        return self._content
+
 class Lexer(object):
     def __init__(self, filename):
         self.commandChars = [c for c in '\\{}#$%^&[]']
