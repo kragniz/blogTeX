@@ -124,13 +124,22 @@ class Transform(object):
         self._tokens = tokens
         self._html = ''
 
+    def __run_method(self, methodName):
+        return getattr(self, methodName)(self)
+
+    def _run_command(self, command):
+        print self.__run_method(command.name)
+
     def paragraph(self):
         lastChar = ''
         for t in self._tokens:
             if type(t) is Command:
-                print t.name
+                print self._run_command(t)
             else:
-                if not (t == ' ' and lastChar == ' '):
+                if t == '\n':
+                    if lastChar == '\n':
+                        print 'NEW PARAGRAPH'
+                elif not (t == ' ' and lastChar == ' '):
                     print '"%s"' % t
                 else: pass
                 lastChar = t
