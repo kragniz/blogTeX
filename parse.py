@@ -128,14 +128,16 @@ class Lexer(object):
                 return args
 
 class Transform(object):
-    def __init__(self, tokens, generator):
+    def __init__(self, tokens):
         self._tokens = tokens
         self._html = ''
-
-        self._generator = generator
+        self._metadata = {}
 
     def _run_command(self, command):
-        getattr(self._generator, command.name)(command)
+        getattr(self, command.name)(command)
+
+    def _join(self, l):
+        return ''.join(str(i) for i in l)
 
     def paragraph(self):
         lastChar = ''
@@ -152,70 +154,13 @@ class Transform(object):
                 else: pass
                 lastChar = t
 
-    @property
-    def output(self):
-        return self._generator.output
-
-def debug(f):
-    def wrapper(*args):
-        if args[0]._debug:
-            print 'running', f.__name__, 'with', args
-        f(*args)
-        if args[0]._debug:
-            print args[0].__dict__
-    return wrapper
-
-class Html(object):
-    def __init__(self):
-        self._output = ''
-        self._debug = False
-
-    @property
-    def output(self):
-        return self._output
-
-    @debug
     def title(self, c):
-        self._title = self._join(c.content)
+        self._metadata['title'] = self._join(c.content)
 
-    @debug
     def author(self, c):
-        self._author = self._join(c.content)
+        self._metadata['author'] = self._join(c.content)
 
-    @debug
-    def maketitle(self, c):
-        self._output += '''<sometag>{title}</sometag>
-<someothertag>{author}</someothertag>
-'''.format(title = self._title, author = self._author)
-
-    @debug
-    def post(self, c):
-        print c.args
-
-    @debug
-    def tag(self, c):
-        self._tags = [tag.strip() for tag in ''.join(c.content).split(',')]
-
-    @debug
-    def begin(self, c):
-        self._output += '<testenviroment>'
-
-    @debug
-    def end(self, c):
-        self._output += '</testenviroment>'
-
-    @debug
-    def newparagraph(self, c):
-        self._output += '''</p>
-<p>'''
-
-    def bf(self, c):
-        self._output += '<strong>' + self._join(c.content) + '</strong>'
-
-    def _join(self, l):
-        return ''.join([str(token) for token in l])
 
 if __name__ == '__main__':
-    t = Transform(Lexer('exampleInput/post.tex').normal_text(), Html())
-    t.paragraph()
-    print t.output
+    t = Transform(Lexer('exampleInput/post.tex').normal_text())
+    print t.paragraph()
