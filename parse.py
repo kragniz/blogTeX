@@ -9,7 +9,7 @@ class Command(object):
     def __str__(self):
         return '<Command: "{0}" Args: "{2}"{1}>'.format(
                 self.name,
-                ' Content: "' + ''.join([str(i) for i in self._content]) + '"'
+                ' Content: "' + _join(self._content) + '"'
                     if self._content
                     else '',
                 self._args
@@ -127,17 +127,26 @@ class Lexer(object):
                 self.__next()
                 return args
 
+def _join(l):
+    return ''.join(str(i) for i in l)
+
+class Post(object):
+    def __init__(self, date, title):
+        self.date = date
+        self.title = title
+
+    def __str__(self):
+        return '<Post date=' + self.date + ' title="' + _join(self.title) + '"'
+
 class Transform(object):
     def __init__(self, tokens):
         self._tokens = tokens
         self._html = ''
-        self._metadata = {}
+        self._metadata = {'tags': []}
+        self._posts = []
 
     def _run_command(self, command):
         getattr(self, command.name)(command)
-
-    def _join(self, l):
-        return ''.join(str(i) for i in l)
 
     def paragraph(self):
         lastChar = ''
@@ -155,11 +164,22 @@ class Transform(object):
                 lastChar = t
 
     def title(self, c):
-        self._metadata['title'] = self._join(c.content)
+        self._metadata['title'] = _join(c.content)
 
     def author(self, c):
-        self._metadata['author'] = self._join(c.content)
+        self._metadata['author'] = _join(c.content)
 
+    def newparagraph(self, c):
+        pass
+
+    def maketitle(self, c):
+        print self._metadata
+
+    def post(self, c):
+        self._posts += [Post(c.args['date'], c.content)]
+
+    def tag(self, c):
+        self._metadata['tags'] += [tag.strip() for tag in _join(c.content).split(',')]
 
 if __name__ == '__main__':
     t = Transform(Lexer('exampleInput/post.tex').normal_text())
