@@ -144,6 +144,7 @@ class Transform(object):
         self._html = ''
         self._metadata = {'tags': []}
         self._posts = []
+        self._scope = []
 
     def _run_command(self, command):
         getattr(self, command.name)(command)
@@ -180,6 +181,12 @@ class Transform(object):
 
     def tag(self, c):
         self._metadata['tags'] += [tag.strip() for tag in _join(c.content).split(',')]
+
+    def begin(self, c):
+        self._scope += _join(c.content)
+
+    def end(self, c):
+        self._scope.pop()
 
 if __name__ == '__main__':
     t = Transform(Lexer('exampleInput/post.tex').normal_text())
