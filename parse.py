@@ -29,7 +29,7 @@ class Command(object):
 
 class Lexer(object):
     def __init__(self, filename):
-        self.commandChars = [c for c in '\\{}#$%^&[]']
+        self.commandChars = list('\\{}#$%^&[]')
         self._tex = open(filename).read()
         self._fileLength = len(self._tex)
         self._i = 0
